@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">BT Devices</string>
+    <string name="username">username</string>
+    <string name="password">password</string>
+    <string name="login">Login</string>
+    <string name="bluetooth_off_warning">The Bluetooth is not available, please turn it on to continue.</string>
+    <string name="turn_on">Turn on</string>
+    <string name="paired_devices">- PAIRED Devices</string>
+    <string name="found_devices">- FOUND Devices</string>
+</resources>
