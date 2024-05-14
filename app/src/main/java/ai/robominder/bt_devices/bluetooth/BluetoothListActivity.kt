@@ -44,6 +44,7 @@ class BluetoothListActivity : AppCompatActivity() {
     lateinit var bluetoothPairedRecyclerView: RecyclerView
     lateinit var bluetoothFoundRecyclerView: RecyclerView
     lateinit var btFoundAdapter: BluetoothRecyclerAdapter
+    lateinit var pairedAdapter: BluetoothRecyclerAdapter
 
     val foundDevices: MutableSet<BluetoothDeviceItem> = mutableSetOf()
 
@@ -65,7 +66,7 @@ class BluetoothListActivity : AppCompatActivity() {
         bluetoothFoundRecyclerView.adapter = btFoundAdapter
 
         bluetoothPairedRecyclerView = findViewById(R.id.bluetooth_paired_list)
-        val pairedAdapter = BluetoothRecyclerAdapter()
+        pairedAdapter = BluetoothRecyclerAdapter()
         bluetoothPairedRecyclerView.adapter = pairedAdapter
 
         if (bluetoothAdapter == null) {
@@ -112,24 +113,27 @@ class BluetoothListActivity : AppCompatActivity() {
         }
 
 
-        val pairedDevices: Set<BluetoothDevice>? = bluetoothAdapter?.bondedDevices
-        if (pairedDevices != null) {
-            pairedAdapter.differ.submitList(pairedDevices.map { it.toBluetoothDeviceDomain(BTType.PAIRED) })
-        }
-
-
         // Register for broadcasts when a device is discovered.
         val filter = IntentFilter(BluetoothDevice.ACTION_FOUND)
         filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_STARTED)
         filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED)
         registerReceiver(receiver, filter)
 
-        bluetoothAdapter?.startDiscovery()
+        findDevices()
 
         swipeRefreshLayout.setOnRefreshListener {
-            if (bluetoothAdapter?.isDiscovering == false)
-                bluetoothAdapter?.startDiscovery()
+            findDevices()
         }
+    }
+
+    @SuppressLint("MissingPermission")
+    private fun findDevices(){
+        val pairedDevices: Set<BluetoothDevice>? = bluetoothAdapter?.bondedDevices
+        if (pairedDevices != null) {
+            pairedAdapter.differ.submitList(pairedDevices.map { it.toBluetoothDeviceDomain(BTType.PAIRED) })
+        }
+        if (bluetoothAdapter?.isDiscovering == false)
+            bluetoothAdapter?.startDiscovery()
     }
 
     // Create a BroadcastReceiver for ACTION_FOUND.
